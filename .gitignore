@@ -21,3 +21,5 @@ docs/book
 *.runlog
 *.properties
 *.log
+*.so
+CppBaseWrapper/build
