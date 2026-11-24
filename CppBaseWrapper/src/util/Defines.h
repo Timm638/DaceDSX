@@ -10,8 +10,7 @@ In 2025, it has been relicensed under the MIT License (https://choosealicense.co
 #pragma once
 
 
-#define SUMO_API_MODE SumoConnectionLibSUMO
-//#define SUMO_API_MODE SumoConnectionTraCI
+// #define SUMO_API_MODE SumoConnectionLibSUMO
 
 // #ifdef DOCKERBUILD
 // #define CONFIG_PROPERTIES "/resource/config.properties"  //docker

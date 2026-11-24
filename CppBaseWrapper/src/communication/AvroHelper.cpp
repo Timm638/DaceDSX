@@ -66,7 +66,7 @@ AvroHelper *AvroHelper::getInstance() {
         AvroHelper::getInstance()->initSchema(SCHEMA_NAME_SYNCMSG, SCHEMA_DEF_SYNCMSG);
         AvroHelper::getInstance()->initSchema(SCHEMA_NAME_VEC3, SCHEMA_DEF_VEC3);
         // AvroHelper::getInstance()->initSchema(SCHEMA_NAME_RADIOMSG11P, SCHEMA_DEF_RADIOMSG11P);
-//        AvroHelper::getInstance()->initSchema(SCHEMA_NAME_RADIOMSG, SCHEMA_DEF_RADIOMSG);
+        AvroHelper::getInstance()->initSchema(SCHEMA_NAME_RADIOMSG, SCHEMA_DEF_RADIOMSG);
     }
     return inst;
 }
@@ -1450,63 +1450,64 @@ datamodel::SyncMsg AvroHelper::decodeSyncMsg(const std::string &pfx, const void 
 //     return msg;
 // }
 
-//std::vector<char> AvroHelper::encodeRadioMsg(datamodel::RadioMsg &msg) {
-//    avro::ValidSchema *avro_schema;
-//    if (schemas.count(SCHEMA_NAME_RADIOMSG) == 0 || (avro_schema = schemas[SCHEMA_NAME_RADIOMSG]->object()) == 0) {
-//        KERROR("schema is not initialized");
-//        exit(1);
-//    }
-//    std::vector<char> out;
-//    std::string errstr;
-//
-//    avro::EncoderPtr e = avro::validatingEncoder(*avro_schema, avro::binaryEncoder());
-//    std::unique_ptr<avro::OutputStream> bin_os = avro::memoryOutputStream();
-//    e->init(*bin_os.get());
-//    avro::encode(*e, msg);
-//    e->flush();
-//
-//    /* Extract written bytes. */
-//    std::shared_ptr<std::vector<uint8_t>> v;
-//    v = avro::snapshot(*bin_os.get());
-//    /* Write framing */
-//    schemas[SCHEMA_NAME_RADIOMSG]->framing_write(out);
-//    /* Write binary encoded Avro to output std::vector */
-//    out.insert(out.end(), v->begin(), v->end());
-//
-//    return out;
-//}
-//datamodel::RadioMsg AvroHelper::decodeRadioMsg(const std::string &pfx, const void *buf, size_t len) {
-//    DS_AVRO_DBG("decodeRadioMsg");
-//    std::string out;
-//    avro::GenericDatum *d = NULL;
-//    Serdes::Schema *schema = NULL;
-//    std::string errstr;
-//
-//    DS_AVRO_DBG("serdes->deserialize");
-//    serdes->deserialize(&schema, &d, buf, len, errstr);
-//
-//    datamodel::RadioMsg msg;
-//    avro::GenericRecord r = d->value<avro::GenericRecord>();
-//    msg.sender = r.field("sender").value<std::string>();
-//    DS_AVRO_DBG("msg.sender "<<msg.sender);
-//    msg.sendTime = r.field("sendTime").value<int64_t>();
-//    DS_AVRO_DBG("msg.sendTime "<<msg.sendTime);
-//    msg.receiver = r.field("receiver").value<std::string>();
-//    DS_AVRO_DBG("msg.receiver "<<msg.receiver);
-//    msg.receiveTime = r.field("receiveTime").value<int64_t>();
-//    DS_AVRO_DBG("msg.receiveTime "<<msg.receiveTime);
-//    avro::GenericMap::Value vp = r.field("data").value<avro::GenericMap>().value();
-//    for (std::pair<std::string, avro::GenericDatum> p : vp) {
-//        msg.data[p.first] = p.second.value<std::string>();
-//    }
-//
-//    if (d)
-//        delete d;
-//
-//    DS_AVRO_DBG("decodeRadioMsg done");
-//
-//    return msg;
-//}
+std::vector<char> AvroHelper::encodeRadioMsg(datamodel::RadioMsg &msg) {
+    avro::ValidSchema *avro_schema;
+    if (schemas.count(SCHEMA_NAME_RADIOMSG) == 0 || (avro_schema = schemas[SCHEMA_NAME_RADIOMSG]->object()) == 0) {
+        KERROR("schema is not initialized");
+        exit(1);
+    }
+    std::vector<char> out;
+    std::string errstr;
+
+    avro::EncoderPtr e = avro::validatingEncoder(*avro_schema, avro::binaryEncoder());
+    std::unique_ptr<avro::OutputStream> bin_os = avro::memoryOutputStream();
+    e->init(*bin_os.get());
+    avro::encode(*e, msg);
+    e->flush();
+
+    /* Extract written bytes. */
+    std::shared_ptr<std::vector<uint8_t>> v;
+    v = avro::snapshot(*bin_os.get());
+    /* Write framing */
+    schemas[SCHEMA_NAME_RADIOMSG]->framing_write(out);
+    /* Write binary encoded Avro to output std::vector */
+    out.insert(out.end(), v->begin(), v->end());
+
+    return out;
+}
+
+datamodel::RadioMsg AvroHelper::decodeRadioMsg(const std::string &pfx, const void *buf, size_t len) {
+    DS_AVRO_DBG("decodeRadioMsg");
+    std::string out;
+    avro::GenericDatum *d = NULL;
+    Serdes::Schema *schema = NULL;
+    std::string errstr;
+
+    DS_AVRO_DBG("serdes->deserialize");
+    serdes->deserialize(&schema, &d, buf, len, errstr);
+
+    datamodel::RadioMsg msg;
+    avro::GenericRecord r = d->value<avro::GenericRecord>();
+    msg.sender = r.field("sender").value<std::string>();
+    DS_AVRO_DBG("msg.sender "<<msg.sender);
+    msg.sendTime = r.field("sendTime").value<int64_t>();
+    DS_AVRO_DBG("msg.sendTime "<<msg.sendTime);
+    msg.receiver = r.field("receiver").value<std::string>();
+    DS_AVRO_DBG("msg.receiver "<<msg.receiver);
+    msg.receiveTime = r.field("receiveTime").value<int64_t>();
+    DS_AVRO_DBG("msg.receiveTime "<<msg.receiveTime);
+    avro::GenericMap::Value vp = r.field("data").value<avro::GenericMap>().value();
+    for (std::pair<std::string, avro::GenericDatum> p : vp) {
+        msg.data[p.first] = p.second.value<std::string>();
+    }
+
+    if (d)
+        delete d;
+
+    DS_AVRO_DBG("decodeRadioMsg done");
+
+    return msg;
+}
 
 
 std::vector<char> AvroHelper::encodeInteractionMsg(datamodel::InteractionMsg &msg) {

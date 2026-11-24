@@ -8,7 +8,7 @@ In 2025, it has been relicensed under the MIT License (https://choosealicense.co
 */
 #pragma once
 
-#include <rdkafkacpp.h>
+#include <librdkafka/rdkafkacpp.h>
 
 #include <iostream>
 #include <map>
